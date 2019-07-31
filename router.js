@@ -26,20 +26,42 @@ module.exports = function(app,io,m){
   function postFile(req, res) {
     console.log("------ Requête reçue ! -----");
     console.log(req.files);
-    for(var i= 0; i<req.files.files.length; i++){
-      if(req.files.files[i].size > 0){
-        var name = req.files.files[i].name;
-        var id = convertToSlug(name);
-        var newPath = __dirname + "/uploads/"+name;
-        console.log(name);
-        fs.readFile(req.files.files[i].path, function (err, data) {
-          fs.writeFile(newPath, data, function (err) {
-            io.sockets.emit("newMedia", {path: newPath, name:name, id: id});
+    var dir = __dirname + "/uploads/";
+    
+    countNumberOfFilesInDir(dir).then(function(result) {
+      for(var i= 0; i<req.files.files.length; i++){
+        if(req.files.files[i].size > 0){
+          var name = req.files.files[i].name;
+          var id = convertToSlug(name);
+          var prefix = result + '-';
+          var nameWithPrefix = prefix + name;
+          var newPath = dir + nameWithPrefix;
+          console.log(nameWithPrefix);
+          fs.readFile(req.files.files[i].path, function (err, data) {
+            fs.writeFile(newPath, data, function (err) {
+              io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
+            });
           });
-        });
+        }
       }
-    }
+    }, function(err) {
+        console.log(err);
+    })
+
+
   };
+
+  function countNumberOfFilesInDir(dir){
+    return new Promise(function(resolve, reject) {
+      fs.readdir(dir, function(err, files){
+        if (err) 
+          reject(err); 
+        else 
+          resolve(files.length);
+      });
+    });
+
+  }
 
 
   function convertToSlug(Text){

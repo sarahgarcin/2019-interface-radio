@@ -6793,6 +6793,8 @@ input {
   padding: 40px 20px 20px 20px;
   text-align:center;
   position:relative;
+  background: #FFF;
+  cursor: grab;
 }
 
 .medias-list li .caption{
@@ -6810,6 +6812,21 @@ audio{
   cursor: pointer;
   background: #FFF;
   z-index:10;
+}
+
+.loop{
+  cursor:pointer;
+  background-color: lightblue;
+  padding: 10px;
+  font-size: 10px;
+}
+
+.loop.active{
+  background-color: lightgreen;
+}
+
+input[type="range"]{
+  opacity:1;
 }
 
 .js--templates {

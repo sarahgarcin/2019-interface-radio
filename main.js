@@ -10,6 +10,8 @@ module.exports = function(app, io){
 	io.on("connection", function(socket){
 		
 		listMedias(socket);
+		socket.on('newPosition', reOrderElementInServeur);
+		socket.on('deleteEl', deleteElement);
 
 	});
 
@@ -21,16 +23,55 @@ module.exports = function(app, io){
 		    //handling error
 		    if (err) {
 		        return console.log('Unable to scan directory: ' + err);
-		    } 
-		    files = files.filter(junk.not);
-		    //listing all files using forEach
-		    files.forEach(function (file) {
-		        // Do whatever you want to do with the file
-		        console.log(file);
-		        socket.emit("listMedias", {name:file});
-
-		    });
+		    }
+		    else{
+		    	// remove junk files like .DS_Store
+		    	files = files.filter(junk.not);
+			    //listing all files using forEach
+			    files.forEach(function (file) {
+			        // Do whatever you want to do with the file
+			        console.log(file);
+			        socket.emit("listMedias", {name:file});
+			    });
+		    }
+		    
+		    
 		});
+	}
+
+	function reOrderElementInServeur(positionArr){
+		const dir = path.join(__dirname, 'uploads');
+		for (var index in positionArr) {
+		  // index == new number
+		  // positionArr[index] == old file to change
+		  var newName = positionArr[index].replace(/^[0-9]-/,(parseInt(index) + 1)+'-');
+		  fs.rename(path.join(dir, positionArr[index]), path.join(dir, newName), function(err) {
+					if ( err ) console.log('ERROR: ' + err);
+					else{
+						io.sockets.emit('newSrc', positionArr);
+					}
+			});
+		}
+
+	}
+
+	function deleteElement(data){
+		console.log(data);
+		var dir = path.join(__dirname, 'uploads');
+		var elementPath = path.join(dir, data.pathEl);
+		console.log(elementPath);
+		fs.unlink(elementPath, (err) => {
+	  if (err) {
+	    console.error(err)
+	    return
+	  }
+	  else{
+		  //file removed
+		  console.log("file " + elementPath + " has been removed");
+		  io.sockets.emit('onDeleteEl', data.id);
+	  }
+
+		})
 	}
 
 

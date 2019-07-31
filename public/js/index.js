@@ -7,7 +7,12 @@ socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
 
 socket.on('listMedias', onListMedias);
-socket.on('newMedia', onNewMedia); // l'event newMedia se trouve dans router.js
+// l'event newMedia se trouve dans router.js
+socket.on('newMedia', onListMedias); 
+socket.on('onDeleteEl', function(id){
+	console.log(id);
+	$('#' + id).remove();
+}); 
 
 jQuery(document).ready(function($) {
 
@@ -42,9 +47,49 @@ function init(){
     return false;
 	});
 
-	$('.close-audio').on('click', function(){
+	// make the elements sortable and get their position 
+	$(".medias-list ul").sortable({
+    stop: function(event, ui) {
+      var newPositionsArr = {};
+      $(".medias-list ul li").each(function(){
+      	newPositionsArr[$(this).index()] = $(this).find('source').attr('src');
+      	var newName = newPositionsArr[$(this).index()].replace(/^[0-9]-/,(parseInt($(this).index()) + 1)+'-');
+      	$(this).find('source').attr('src', newName);
+      });
+
+      // send new position to the server
+      socket.emit('newPosition', newPositionsArr);
+    }
+});
+
+	$('body').on('click', '.close-audio',function(){
 		var thisPath = $(this).parents('li').find('source').attr('src');
-		console.log(thisPath);
+		var thisId = $(this).parents('li').attr('id');
+		socket.emit('deleteEl', {pathEl:thisPath, id: thisId});
+	});
+
+	$('body').on('click', '.loop',function(){
+		if($(this).hasClass('active')){
+			$(this).removeClass('active');
+			$(this).parents('li').find('audio').attr('loop', false);
+		}
+		else{
+			$(this).addClass('active');
+			$(this).parents('li').find('audio').attr('loop', true);
+		}
+		
+	});
+
+
+	$('body').on('input', '#speed-slider',function(){
+		var speedVal = $(this).val();
+		$(this).next('.speedValue').html(speedVal);
+		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].playbackRate = speedVal;
+	});
+	$('body').on('input', '#volume-slider',function(){
+		var volumeVal = $(this).val();
+		$(this).next('.volumeValue').html(volumeVal);
+		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].volume = volumeVal;
 	});
 
 }
@@ -55,50 +100,51 @@ function onListMedias(data){
 	var ext = data.name.split('.').pop();
 	var mediaItem;
 
-	if(ext == 'mp3'){
-		mediaItem = $(".js--templates .son").clone(false);
-		mediaItem
-		  .find('source')
-		    .attr('src', path)
-		  .end()
-		  .attr('id', id)
-		 ;
-		mediaItem
-			.find('.caption')
-			.html(data.name.replace('.mp3', ''))
-		;
-	}
+		if(ext == 'mp3'){
+			mediaItem = $(".js--templates .son").clone(false);
+			mediaItem
+			  .find('source')
+			    .attr('src', path)
+			  .end()
+			  .attr('id', id)
+			 ;
+			mediaItem
+				.find('.caption')
+				.html(data.name.replace('.mp3', '').replace(/^[0-9]-/,''))
+			;
+		}
 
-  $('.medias-list ul').append(mediaItem);
+
+  	$('.medias-list ul').append(mediaItem);
 
 }
 
-function onNewMedia(data){
-	var path = data.name;
-	var id = data.id;
-	var ext = data.name.split('.').pop();
-	var mediaItem;
+// function onNewMedia(data){
+// 	var path = data.name;
+// 	var id = data.id;
+// 	var ext = data.name.split('.').pop();
+// 	var mediaItem;
 
-	if(ext == 'mp3'){
-		mediaItem = $(".js--templates .son").clone(false);
-		mediaItem
-		  .find('source')
-		    .attr('src', path)
-		  .end()
-		  .attr('id', id)
-		;
-		mediaItem
-			.find('.caption')
-			.html(data.name.replace('.mp3', ''))
-		;
-	}
+// 	if(ext == 'mp3'){
+// 		mediaItem = $(".js--templates .son").clone(false);
+// 		mediaItem
+// 		  .find('source')
+// 		    .attr('src', path)
+// 		  .end()
+// 		  .attr('id', id)
+// 		;
+// 		mediaItem
+// 			.find('.caption')
+// 			.html(data.name.replace('.mp3', '').replace(/^[0-9]-/,''))
+// 		;
+// 	}
 
 
 
-	$('.medias-list ul').append(mediaItem);
+// 	$('.medias-list ul').append(mediaItem);
 	  
 
-}
+// }
 
 
 /* sockets */

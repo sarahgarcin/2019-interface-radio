@@ -47,17 +47,6 @@ function init(){
 		console.log(thisPath);
 	});
 
-	// ctrl + f -> Clear le pad -> supprime toutes les images
-	$(document).keypress("f",function(e) {
-	  // if(e.ctrlKey){
-	  // 	console.log('test2');
-	    socket.emit("clearPad");
-	    padCleared()
-	  // }
-	});
-
-
-
 }
 
 function onListMedias(data){
@@ -111,10 +100,6 @@ function onNewMedia(data){
 
 }
 
-
-function padCleared(){
-	location.reload();
-}
 
 /* sockets */
 function onSocketConnect() {

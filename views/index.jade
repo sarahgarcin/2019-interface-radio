@@ -17,19 +17,22 @@ html
     .js--templates
       li.son
         div.close-audio
-          span close
+          span ×
+        p.caption
         audio(controls preload="auto")
           source()
-        p.caption
         div.options-button
-          div.loop
-            span loop
-          div.speed
-            input(id="speed-slider" type="range" min="0.25" max="3" step="0.25"  value="1")
-            span.speedValue 1
-          div.speed
+          div.volume
+            span 🔈
             input(id="volume-slider" type="range" min="0" max="1" step="0.1"  value="1")
-            span.volumeValue 1
+            span 🔊
+          div.loop
+            span ↺
+          div.speed
+            span ⟩
+            input(id="speed-slider" type="range" min="0.25" max="3" step="0.25"  value="1")
+            span ⟫
+          
             
 
 

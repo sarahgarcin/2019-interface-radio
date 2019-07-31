@@ -6761,7 +6761,7 @@ html {
 
 body, html {
   height: 100%;
-  font-family: 'nanook', serif; }
+  font-family: 'Helvetica', sans-serif; }
 
 li {
   list-style: none; }
@@ -6770,10 +6770,14 @@ body {
   margin: 0;
   color: #000;
   font-size: 1em;
-  overflow: hidden; }
+  background-color: #F2F2F2;
+}
 
-input {
-  opacity: 0; }
+input[type="file"] {
+  opacity: 0; 
+  margin: 0;
+}
+
 
 .drop-files-container {
   height: 100%;
@@ -6790,7 +6794,7 @@ input {
   width: calc(25% - (20px * 2.5));
   border: 1px solid #000;
   margin: 20px;
-  padding: 40px 20px 20px 20px;
+  padding: 10px 10px 10px 10px;
   text-align:center;
   position:relative;
   background: #FFF;
@@ -6798,7 +6802,9 @@ input {
 }
 
 .medias-list li .caption{
-  margin-bottom:0;
+  margin-bottom:15px;
+  line-height: 1.2;
+  font-size: 15px;
 }
 
 audio{
@@ -6807,22 +6813,50 @@ audio{
 
 .close-audio{
   position: absolute;
-  top:-10px; 
-  right:-20px;
+  top:-12px; 
+  right:-12px;
   cursor: pointer;
   background: #FFF;
+  border-radius: 50%;
+  border: 1px solid #000;
+  padding: 0 5px;
+  line-height: 1;
   z-index:10;
+  font-size: 20px;
+}
+
+.volume, .loop, .speed{
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .loop{
   cursor:pointer;
   background-color: lightblue;
-  padding: 10px;
-  font-size: 10px;
+  padding: 1px 7px 3px 7px;
+  display:inline-block;
+  font-size: 25px;
+  line-height: 1;
+  margin-right: 10px;
 }
 
 .loop.active{
   background-color: lightgreen;
+}
+
+.speed{
+  display: inline-block;
+  width: 80%;
+}
+
+.speed span{
+  font-size: 25px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+#speed-slider{
+  width: 80%;
 }
 
 input[type="range"]{

@@ -80,7 +80,6 @@ function init(){
 		
 	});
 
-
 	$('body').on('input', '#speed-slider',function(){
 		var speedVal = $(this).val();
 		$(this).next('.speedValue').html(speedVal);
@@ -91,6 +90,8 @@ function init(){
 		$(this).next('.volumeValue').html(volumeVal);
 		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].volume = volumeVal;
 	});
+
+
 
 }
 

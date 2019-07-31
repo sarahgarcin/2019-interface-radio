@@ -44,7 +44,7 @@ module.exports = function(app, io){
 		for (var index in positionArr) {
 		  // index == new number
 		  // positionArr[index] == old file to change
-		  var newName = positionArr[index].replace(/^[0-9]-/,(parseInt(index) + 1)+'-');
+		  var newName = positionArr[index].replace(/^[^-]+-/,(parseInt(index) + 1)+'-');
 		  fs.rename(path.join(dir, positionArr[index]), path.join(dir, newName), function(err) {
 					if ( err ) console.log('ERROR: ' + err);
 					else{

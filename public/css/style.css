@@ -6771,6 +6771,7 @@ body {
   color: #000;
   font-size: 1em;
   background-color: #F2F2F2;
+  overflow-x: hidden;
 }
 
 input[type="file"] {
@@ -6838,6 +6839,7 @@ audio{
   font-size: 25px;
   line-height: 1;
   margin-right: 10px;
+  border: 1px solid #A1A1A1;
 }
 
 .loop.active{

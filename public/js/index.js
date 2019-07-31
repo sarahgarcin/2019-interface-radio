@@ -53,7 +53,7 @@ function init(){
       var newPositionsArr = {};
       $(".medias-list ul li").each(function(){
       	newPositionsArr[$(this).index()] = $(this).find('source').attr('src');
-      	var newName = newPositionsArr[$(this).index()].replace(/^[0-9]-/,(parseInt($(this).index()) + 1)+'-');
+      	var newName = newPositionsArr[$(this).index()].replace(/^[^-]+-/,(parseInt($(this).index()) + 1)+'-');
       	$(this).find('source').attr('src', newName);
       });
 
@@ -90,9 +90,6 @@ function init(){
 		$(this).next('.volumeValue').html(volumeVal);
 		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].volume = volumeVal;
 	});
-
-
-
 }
 
 function onListMedias(data){
@@ -101,7 +98,7 @@ function onListMedias(data){
 	var ext = data.name.split('.').pop();
 	var mediaItem;
 
-		if(ext == 'mp3'){
+		if(ext == 'mp3' || ext == 'wav'){
 			mediaItem = $(".js--templates .son").clone(false);
 			mediaItem
 			  .find('source')
@@ -111,10 +108,9 @@ function onListMedias(data){
 			 ;
 			mediaItem
 				.find('.caption')
-				.html(data.name.replace('.mp3', '').replace(/^[0-9]-/,''))
+				.html(data.name.replace('.mp3', '').replace('.wav', '').replace(/^[^-]+-/,''))
 			;
 		}
-
 
   	$('.medias-list ul').append(mediaItem);
 
@@ -136,7 +132,7 @@ function onListMedias(data){
 // 		;
 // 		mediaItem
 // 			.find('.caption')
-// 			.html(data.name.replace('.mp3', '').replace(/^[0-9]-/,''))
+// 			.html(data.name.replace('.mp3', '').replace(/^[^-]+-/,''))
 // 		;
 // 	}
 

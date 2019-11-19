@@ -25,28 +25,81 @@ module.exports = function(app,io,m){
 
   function postFile(req, res) {
     console.log("------ Requête reçue ! -----");
-    console.log(req.files);
     var dir = __dirname + "/uploads/";
-    
-    countNumberOfFilesInDir(dir).then(function(result) {
-      for(var i= 0; i<req.files.files.length; i++){
-        if(req.files.files[i].size > 0){
-          var name = req.files.files[i].name;
-          var id = convertToSlug(name);
-          var prefix = result + '-';
-          var nameWithPrefix = prefix + name;
-          var newPath = dir + nameWithPrefix;
-          console.log(nameWithPrefix);
-          fs.readFile(req.files.files[i].path, function (err, data) {
-            fs.writeFile(newPath, data, function (err) {
-              io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
-            });
-          });
+
+    // https://github.com/burib/nodejs-multiple-file-upload-example
+    req.files.files.forEach(function (element, index, array) {
+      if(index > 0){
+      fs.readFile(element.path, function (err, data) {
+        var name = element.name;
+        var id = convertToSlug(name);
+        if(index < 10){
+          var prefix = '0' + index + '-';
         }
+        else{
+          var prefix = index + '-';
+        }
+        var nameWithPrefix = prefix + name;
+        var newPath = dir + nameWithPrefix;
+        fs.writeFile(newPath, data, function (err) {
+          io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
+          if(err) {
+            console.log(err);
+          }
+        });
+      });
       }
-    }, function(err) {
-        console.log(err);
-    })
+    });
+
+
+    
+    // countNumberOfFilesInDir(dir).then(function(result) {
+    //   for(var i= 0; i<req.files.files.length; i++){
+    //     if(req.files.files[i].size > 0){
+    //       // console.log(nameWithPrefix);
+    //       // console.log('fichier base', req.files.files[i]);
+    //       // fs.readFile(req.files.files[i].path, function (err, data) {
+
+    //       //   console.log('fichier après promise', file);
+    //       //   var name = file.name;
+    //       //   var id = convertToSlug(name);
+    //       //   if(result < 10){
+    //       //     var prefix = '0' + result + '-';
+    //       //   }
+    //       //   else{
+    //       //     var prefix = result + '-';
+    //       //   }
+    //       //   var nameWithPrefix = prefix + name;
+    //       //   var newPath = dir + nameWithPrefix;
+    //       //   writeTheFile(newPath, filePath).then(function(data){
+    //       //     // console.log(data);
+
+    //       //     io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
+    //       //   });
+    //       // }); 
+    //         var name = req.files.files[i].name;
+    //         fs.readFile(req.files.files[i].path, function (err, data) {
+              
+    //           var id = convertToSlug(name);
+    //           if(result < 10){
+    //             var prefix = '0' + result + '-';
+    //           }
+    //           else{
+    //             var prefix = result + '-';
+    //           }
+    //           var nameWithPrefix = prefix + name;
+    //           var newPath = dir + nameWithPrefix;
+    //           fs.writeFile(newPath, data, function (err) {
+    //             io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
+    //           });
+    //         });
+          
+          
+    //     }
+    //   }
+    // }, function(err) {
+    //     console.log(err);
+    // })
 
 
   };

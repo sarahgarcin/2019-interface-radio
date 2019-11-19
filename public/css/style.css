@@ -6772,6 +6772,7 @@ body {
   font-size: 1em;
   background-color: #F2F2F2;
   overflow-x: hidden;
+  transition: all 0.5s linear;
 }
 
 input[type="file"] {
@@ -6792,9 +6793,9 @@ input[type="file"] {
   flex-wrap: wrap;
 }
 .medias-list li {
-  width: calc(25% - (20px * 2.5));
+  width: calc(25% - (10px * 2.5));
   border: 1px solid #000;
-  margin: 20px;
+  margin: 10px;
   padding: 10px 10px 10px 10px;
   text-align:center;
   position:relative;
@@ -6842,13 +6843,13 @@ audio{
   border: 1px solid #A1A1A1;
 }
 
-.loop.active{
+.loop:hover, .loop.active{
   background-color: lightgreen;
 }
 
 .speed{
   display: inline-block;
-  width: 80%;
+  width: 84%;
 }
 
 .speed span{
@@ -6858,12 +6859,53 @@ audio{
 }
 
 #speed-slider{
-  width: 80%;
+  width: 72%;
 }
 
 input[type="range"]{
   opacity:1;
 }
 
+.speedValue, .volumeValue{
+  height: 20px;
+  width: 25px;
+  border: 1px solid grey; 
+  font-size: 13px !important; 
+  text-align: center;
+  display: inline-block;
+  border-radius: 20%;
+  color: grey;
+  vertical-align:top;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.volume .volumeValue{
+  padding-bottom: 3px;
+}
+
+.speed .speedValue{
+  padding-top: 3px;
+}
+
 .js--templates {
   display: none; }
+
+.infos-empty{
+  width: calc(100% - 40px);
+  height: calc(100vh - 40px);
+  margin: 20px;
+  border: 2px dashed ;
+  text-align: center; 
+  padding: 50px;
+  font-size: 20px;
+  color: #808080;
+   
+}
+
+body.active{
+  background-color: lightblue;
+}
+
+
+

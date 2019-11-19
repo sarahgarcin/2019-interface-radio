@@ -7,11 +7,17 @@ socket.on('connect', onSocketConnect);
 socket.on('error', onSocketError);
 
 socket.on('listMedias', onListMedias);
+socket.on('emptyFolder', onEmptyFolder);
+
 // l'event newMedia se trouve dans router.js
 socket.on('newMedia', onListMedias); 
 socket.on('onDeleteEl', function(id){
 	console.log(id);
 	$('#' + id).remove();
+	if($('.medias-list ul li').length < 1){
+		$('.infos-empty').show();
+	}
+	
 }); 
 
 jQuery(document).ready(function($) {
@@ -23,8 +29,11 @@ jQuery(document).ready(function($) {
 
 function init(){
 
+
+
 	$(window).on('dragover',function(e){
 		$(".drop-files-container").css('pointer-events', "auto");
+		$("body").addClass('active');
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -41,6 +50,8 @@ function init(){
     var files = e.originalEvent.dataTransfer.files;
     processFileUpload(files); 
     $(".drop-files-container").css('pointer-events', "none");
+    $('.infos-empty').hide();
+    $("body").removeClass('active');
  		// var id = convertToSlug(files[0].name);
 		// socket.emit("dropFile", {id:id});
   	// forward the file object to your ajax upload method
@@ -82,15 +93,22 @@ function init(){
 
 	$('body').on('input', '#speed-slider',function(){
 		var speedVal = $(this).val();
-		$(this).next('.speedValue').html(speedVal);
+		console.log($(this).next('span').next('.speedValue'));
+		$(this).next('span').next('.speedValue').html(speedVal);
 		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].playbackRate = speedVal;
 	});
 	$('body').on('input', '#volume-slider',function(){
 		var volumeVal = $(this).val();
-		$(this).next('.volumeValue').html(volumeVal);
+		$(this).next('span').next('.volumeValue').html(volumeVal);
 		 this.parentNode.parentNode.parentNode.getElementsByTagName("audio")[0].volume = volumeVal;
 	});
 }
+
+function onEmptyFolder(){
+	$('.drop-files-container').append('<div class="infos-empty">Glissez des fichiers audio ici</div>');
+}
+
+
 
 function onListMedias(data){
 	var path = data.name;
@@ -98,21 +116,23 @@ function onListMedias(data){
 	var ext = data.name.split('.').pop();
 	var mediaItem;
 
-		if(ext == 'mp3' || ext == 'wav'){
-			mediaItem = $(".js--templates .son").clone(false);
-			mediaItem
-			  .find('source')
-			    .attr('src', path)
-			  .end()
-			  .attr('id', id)
-			 ;
-			mediaItem
-				.find('.caption')
-				.html(data.name.replace('.mp3', '').replace('.wav', '').replace(/^[^-]+-/,''))
-			;
-		}
+	if(ext == 'mp3' || ext == 'wav'){
+		mediaItem = $(".js--templates .son").clone(false);
+		mediaItem
+		  .find('source')
+		    .attr('src', path)
+		  .end()
+		  .attr('id', id)
+		 ;
+		mediaItem
+			.find('.caption')
+			.html(data.name.replace('.mp3', '').replace('.wav', '').replace(/^[^-]+-/,''))
+		;
+	}
 
-  	$('.medias-list ul').append(mediaItem);
+	$('.medias-list ul').append(mediaItem);
+
+	
 
 }
 
@@ -148,6 +168,7 @@ function onListMedias(data){
 function onSocketConnect() {
 	sessionId = socket.io.engine.id;
 	console.log('Connected ' + sessionId);
+
 };
 
 function onSocketError(reason) {

@@ -1,0 +1,55 @@
+doctype html
+html
+  head
+    link(rel='stylesheet', href='/css/style.css')
+    title #{title}
+  body(data-page='index')
+    header
+      a(href="/")
+        h1 Tool for Awesome Radio Shows
+      div.right-infos #{title} — #{date} par #{auteur}
+
+    .drop-files-container
+
+
+    form(enctype="multipart/form-data" id="form")
+      input(type="file" name="files[]" multiple="multiple")
+
+
+    .medias-list
+      ul
+
+    .js--templates
+      li.son
+        div.close-audio
+          span ×
+        p.caption
+        audio(controls preload="auto")
+          source()
+        div.options-button
+          div.volume
+            span 🔈
+            input(id="volume-slider" type="range" min="0" max="1" step="0.1"  value="1")
+            span 🔊
+            span.volumeValue 1
+          div.loop
+            span ↺
+          div.speed
+            span ⟩
+            input(id="speed-slider" type="range" min="0.25" max="3" step="0.25"  value="1")
+            span ⟫
+            span.speedValue 1
+          
+            
+
+
+    script(src='/socket.io/socket.io.js')
+    script(src='/bower_components/jquery/dist/jquery.min.js')
+    script(src='/bower_components/jquery-ui/jquery-ui.min.js')
+    script(src='/js/libs/jquery.ui.touch-punch.min.js')
+    //- script(src='/bower_components/foundation/js/foundation.min.js')
+
+
+    script(src='/js/mix.js')
+
+

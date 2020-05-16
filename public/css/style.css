@@ -6775,11 +6775,87 @@ body {
   transition: all 0.5s linear;
 }
 
+header{
+  background: #FFF;
+  padding: 5px 20px;
+  width: 100%;
+  display: flex;
+}
+
+header h1{
+  font-size: 15px;
+  margin:0;
+}
+
+header .right-infos{
+  margin: 0;
+  font-size: 15px;
+}
+
+.container{
+  padding: 20px;
+  display:flex;
+}
+
+.container h2{
+  font-size: 1.5em; 
+  line-height: 1.2;
+}
+
+.left-part{
+  width: 20%;
+}
+
+.right-part{
+  width: 70%;
+  margin-left: 10%; 
+}
+
+.js-add-mix{
+  background-color: lightblue;
+  border: 1px solid #A1A1A1;
+  padding: 10px;
+}
+.js-add-mix:hover{
+  background-color: lightgreen;
+}
+
+.dossier-list{
+  display:flex;
+  margin:0;
+}
+
+.dossier-list > li{
+  width: calc(25% - (10px * 2.5));
+  border: 1px solid #000;
+  margin: 10px;
+  padding: 0px 0px 10px 0px;
+  text-align:center;
+  background: #FFF;
+}
+
+.dossier-list > li h3{
+  margin:0; 
+  background: #000;
+  color: #FFF;
+  padding: 0px 10px 5px;
+  margin-bottom: 10px;
+}
+
+.dossier-list > li h3:hover{
+  color: #000; 
+  background: lightblue;
+}
+
+.meta-data{
+  font-size: 0.8em;
+  line-height: 1.2;
+}
+
 input[type="file"] {
   opacity: 0; 
   margin: 0;
 }
-
 
 .drop-files-container {
   height: 100%;
@@ -6801,12 +6877,17 @@ input[type="file"] {
   position:relative;
   background: #FFF;
   cursor: grab;
+  transition: opacity 0.7s ease;
 }
 
 .medias-list li .caption{
   margin-bottom:15px;
   line-height: 1.2;
   font-size: 15px;
+}
+
+.medias-list li.ui-sortable-helper{
+  opacity:0.6;
 }
 
 audio{
@@ -6901,6 +6982,15 @@ input[type="range"]{
   font-size: 20px;
   color: #808080;
    
+}
+
+header{
+  position: relative;
+}
+
+.right-infos{
+  position:absolute;
+  right: 10px;
 }
 
 body.active{

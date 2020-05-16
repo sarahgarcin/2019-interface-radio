@@ -4,7 +4,11 @@ var fs = require('fs-extra');
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 var formidable = require('formidable');
-
+var parsedown = require('woods-parsedown'),
+    slugg = require('slugg'),
+    moment = require('moment'),
+    path = require("path");
+var contentDir = "sessions";
 
 module.exports = function(app,io,m){
 
@@ -12,43 +16,76 @@ module.exports = function(app,io,m){
   * routing event
   */
   app.get("/", getIndex);
-  app.post("/file-upload", multipartMiddleware, postFile);
+  // app.post("/file-upload", multipartMiddleware, postFile);
+
+  app.get("/:mix", getMix);
+  app.post("/:mix/file-upload", multipartMiddleware, postFile);
 
   /**
   * routing functions
   */
 
   // GET
+  // function getIndex(req, res) {
+  //   res.render("index", {title : "radio psg matin"});
+  // };
+
   function getIndex(req, res) {
-    res.render("index", {title : "radio psg matin"});
+    var pageTitle = "Tool for Awesome Radio Shows";
+    res.render("index", {title : pageTitle});
+  };
+
+  function getMix(req, res) {
+    var fmeta = getFolderMeta(req.params.mix);
+    var mixTitle = fmeta.name;
+    var mixDate = fmeta.date; 
+    var mixAuteur = fmeta.auteur;
+    res.render("mixette", {title : mixTitle, date: mixDate, auteur: mixAuteur});
   };
 
   function postFile(req, res) {
     console.log("------ Requête reçue ! -----");
-    var dir = __dirname + "/uploads/";
+    var slugMixName = req.params.mix;
+    var dir = getFullPath(slugMixName);
+    console.log(dir);
+    // var dir = __dirname + "/uploads/";
 
-    // https://github.com/burib/nodejs-multiple-file-upload-example
+    // // https://github.com/burib/nodejs-multiple-file-upload-example
     req.files.files.forEach(function (element, index, array) {
-      if(index > 0){
-      fs.readFile(element.path, function (err, data) {
-        var name = element.name;
-        var id = convertToSlug(name);
-        if(index < 10){
-          var prefix = '0' + index + '-';
+      // console.log(index);
+      countNumberOfFilesInDir(dir).then(function(result) {
+        if(index > 0){
+          fs.readFile(element.path, function (err, data) {
+            var name = element.name;
+            var id = convertToSlug(name);
+            if(result < 10){
+              var prefix = '0' + result + '-';
+            }
+            else{
+              var prefix = result + '-';
+            }
+            var nameWithPrefix = prefix + name;
+            var newPath = dir +'/'+ nameWithPrefix;
+            fs.writeFile(newPath, data, function (err) {
+              io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
+              // supprimer les fichiers temporaires stockés par multipart
+              fs.unlink(element.path, (err) => {
+                if (err) {
+                  console.error(err)
+                  return
+                }
+                console.log('file has been removed');
+              });
+              if(err) {
+                console.log(err);
+              }
+            });
+
+
+          });
         }
-        else{
-          var prefix = index + '-';
-        }
-        var nameWithPrefix = prefix + name;
-        var newPath = dir + nameWithPrefix;
-        fs.writeFile(newPath, data, function (err) {
-          io.sockets.emit("newMedia", {path: newPath, name:nameWithPrefix, id: id});
-          if(err) {
-            console.log(err);
-          }
-        });
       });
-      }
+
     });
 
 
@@ -104,6 +141,7 @@ module.exports = function(app,io,m){
 
   };
 
+
   function countNumberOfFilesInDir(dir){
     return new Promise(function(resolve, reject) {
       fs.readdir(dir, function(err, files){
@@ -140,6 +178,77 @@ module.exports = function(app,io,m){
     s = s.replace(/\-+/g, '-');
     // renvoi le texte modifié
     return s;
+  }
+
+
+  function getFolderMeta( slugFolderName) {
+    console.log( "COMMON — getFolderMeta");
+
+    var folderPath = getFullPath( slugFolderName);
+    var folderMetaFile = getMetaFileOfFolder( folderPath);
+
+    var folderData = fs.readFileSync( folderMetaFile,"UTF-8");
+    var folderMetadata = parseData( folderData);
+
+    return folderMetadata;
+  }
+
+  function getFullPath( path) {
+    return contentDir + "/" + path;
+  }
+
+  function getMetaFileOfFolder( folderPath) {
+    return folderPath + '/' + 'data' + '.txt';
+  }
+
+  function parseData(d) {
+    var parsed = parsedown(d);
+    return parsed;
+  }
+
+  function getCurrentDate() {
+    return moment().format('YYYYMMDD_HHmmss');
+  }
+
+  function storeData( mpath, d, e) {
+    return new Promise(function(resolve, reject) {
+      console.log('Will store data', mpath);
+      var textd = textifyObj(d);
+      if( e === "create") {
+        fs.appendFile( mpath, textd, function(err) {
+          if (err) reject( err);
+          resolve(parseData(textd));
+        });
+      }
+      if( e === "update") {
+        fs.writeFile( mpath, textd, function(err) {
+        if (err) reject( err);
+          resolve(parseData(textd));
+        });
+      }
+    });
+  }
+
+  function textifyObj( obj) {
+    var str = '';
+    // console.log( '1. will prepare string for storage');
+    for (var prop in obj) {
+      var value = obj[prop];
+      // console.log('2. value ? ' + value);
+      // if value is a string, it's all good
+      // but if it's an array (like it is for medias in publications) we'll need to make it into a string
+      if( typeof value === 'array')
+        value = value.join(', ');
+      // check if value contains a delimiter
+      if( typeof value === 'string' && value.indexOf('\n----\n') >= 0) {
+        // console.log( '2. WARNING : found a delimiter in string, replacing it with a backslash');
+        // prepend with a space to neutralize it
+        value = value.replace('\n----\n', '\n ----\n');
+      }
+      str += prop + ': ' + value + "\n\n----\n\n";
+    }
+    // console.log( '3. textified object : ' + str);
+    return str;
   }
 
 };

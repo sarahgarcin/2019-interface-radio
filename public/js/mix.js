@@ -37,7 +37,6 @@ jQuery(document).ready(function($) {
 function init(){
 
 
-
 	$(window).on('dragover',function(e){
 		$(".drop-files-container").css('pointer-events', "auto");
 		$("body").addClass('active');
@@ -135,11 +134,28 @@ function onListMedias(data){
 			.find('.caption')
 			.html(data.name.replace('.mp3', '').replace('.wav', '').replace(/^[^-]+-/,''))
 		;
+
+		var randomId = (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+		mediaItem.find('.waveform').attr('id', randomId);
+
 	}
 
 	$('.medias-list ul').append(mediaItem);
-
+	var wavesurfer = WaveSurfer.create({
+	    container: '#'+randomId,
+	    waveColor: 'lightblue',
+	    progressColor: 'lightgreen', 
+	});
+	wavesurfer.load(path);
 	
+	// AUDIO PLAYER
+	$('[data-action="play"]').on('click', function(){
+		// console.log('test');
+		// console.log($(this).parents('.son').find('.waveform'));
+		wavesurfer.playPause.bind(wavesurfer)
+	});
+
+
 
 }
 

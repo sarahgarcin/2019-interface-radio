@@ -26,6 +26,11 @@ html
         p.caption
         audio(controls preload="auto")
           source()
+        div.waveform
+        div.controls
+          button.btn.btn-primary(data-action="play")
+            i.glyphicon.glyphicon-play Play /
+            i.glyphicon.glyphicon-pause Pause
         div.options-button
           div.volume
             span 🔈
@@ -47,6 +52,8 @@ html
     script(src='/bower_components/jquery/dist/jquery.min.js')
     script(src='/bower_components/jquery-ui/jquery-ui.min.js')
     script(src='/js/libs/jquery.ui.touch-punch.min.js')
+    script(src='/js/libs/wavesurfer.js')
+
     //- script(src='/bower_components/foundation/js/foundation.min.js')
 
 
